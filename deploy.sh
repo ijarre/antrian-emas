@@ -4,13 +4,22 @@
 echo "🤖 ANTAM Bot Dashboard Deployment Script"
 echo "========================================"
 
+# Check if GitHub repo URL is provided
+if [ -z "$1" ]; then
+    echo "❌ Please provide your GitHub repository URL"
+    echo "Usage: ./deploy.sh https://github.com/yourusername/your-repo.git"
+    exit 1
+fi
+
+REPO_URL="$1"
+
 # Update system
 echo "📦 Updating system packages..."
 apt update && apt upgrade -y
 
-# Install Python and required packages
-echo "🐍 Installing Python and dependencies..."
-apt install -y python3 python3-pip python3-venv wget curl unzip
+# Install Git, Python and required packages
+echo "🐍 Installing Git, Python and dependencies..."
+apt install -y git python3 python3-pip python3-venv wget curl unzip
 
 # Install Chrome and ChromeDriver
 echo "🌐 Installing Google Chrome..."
@@ -33,19 +42,19 @@ rm chromedriver_linux64.zip
 echo "🖥️ Installing Xvfb for headless display..."
 apt install -y xvfb
 
-# Create application directory
-echo "📁 Setting up application directory..."
-mkdir -p /opt/antam-bot
+# Clone repository
+echo "📥 Cloning repository from GitHub..."
+if [ -d "/opt/antam-bot" ]; then
+    rm -rf /opt/antam-bot
+fi
+git clone "$REPO_URL" /opt/antam-bot
 cd /opt/antam-bot
 
-# You'll need to upload your files here
-echo "📤 Please upload your application files to /opt/antam-bot/"
-echo "Files needed:"
-echo "  - bot_dashboard.py"
-echo "  - antam_bot.py"
-echo "  - requirements.txt"
-echo "  - start.sh"
-echo "  - antam-bot.service"
-echo "  - templates/ directory"
+# Run setup script
+echo "🚀 Running application setup..."
+chmod +x setup_app.sh
+./setup_app.sh
+
 echo ""
-echo "Then run: bash /opt/antam-bot/setup_app.sh"
+echo "✅ Deployment complete!"
+echo "🔗 Access your dashboard at: http://$(curl -s ifconfig.me):5005"
