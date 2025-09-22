@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANTAM Bot Control Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .status-running {
+            color: #0d6efd;
+        }
+
+        .status-success {
+            color: #198754;
+        }
+
+        .status-failed {
+            color: #dc3545;
+        }
+
+        .status-timeout {
+            color: #fd7e14;
+        }
+
+        .status-pending {
+            color: #6c757d;
+        }
+
+        .status-cancelled {
+            color: #dc3545;
+        }
+
+        .card-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #379777;
+        }
+
+        .refresh-btn {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #379777;">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-robot"></i>
+                ANTAM Bot Control Panel
+            </a>
+
+            <div class="navbar-nav">
+                <a class="nav-link active" href="/">Dashboard</a>
+                <a class="nav-link" href="/schedules">Schedules</a>
+                <a class="nav-link" href="/add-task">Add Task</a>
+                <a class="nav-link" href="/settings">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'danger' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card card-stats">
+                    <div class="card-body text-center">
+                        <i class="bi bi-play-circle-fill fs-1"></i>
+                        <h3 class="mt-2">{{ stats.total_runs_today }}</h3>
+                        <p>Total Runs Today</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <i class="bi bi-check-circle-fill fs-1"></i>
+                        <h3 class="mt-2">{{ stats.successful_today }}</h3>
+                        <p>Successful Today</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <i class="bi bi-calendar3 fs-1"></i>
+                        <h3 class="mt-2">{{ stats.active_schedules }}</h3>
+                        <p>Active Schedules</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Recent Runs -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history"></i>
+                            Recent Bot Runs
+                        </h5>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="location.reload()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_runs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Site</th>
+                                        <th>Start Time</th>
+                                        <th>Duration</th>
+                                        <th>Attempts</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for run in recent_runs %}
+                                    <tr>
+                                        <td>{{ run.site_name }}</td>
+                                        <td>{{ run.start_time.split('.')[0] if run.start_time else 'N/A' }}</td>
+                                        <td>
+                                            {% if run.end_time and run.start_time %}
+                                            {% set duration_text = "Completed" %}
+                                            {% if run.status == 'success' %}
+                                            <span class="text-success">{{ duration_text }}</span>
+                                            {% elif run.status == 'cancelled' %}
+                                            <span class="text-danger">Cancelled</span>
+                                            {% elif run.status == 'failed' %}
+                                            <span class="text-danger">Failed</span>
+                                            {% elif run.status == 'timeout' %}
+                                            <span class="text-warning">Timeout</span>
+                                            {% else %}
+                                            {{ duration_text }}
+                                            {% endif %}
+                                            {% else %}
+                                            <span class="text-primary">Running...</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ run.attempts or 0 }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="status-{{ run.status }}">
+                                                <i
+                                                    class="bi bi-{% if run.status == 'success' %}check-circle-fill{% elif run.status == 'failed' %}x-circle-fill{% elif run.status == 'cancelled' %}stop-circle-fill{% elif run.status == 'running' %}arrow-clockwise{% else %}clock-fill{% endif %}"></i>
+                                                {{ run.status.title() }}
+                                            </span>
+                                            {% if run.status == 'running' %}
+                                            <form method="POST" action="/cancel-run/{{ run.id }}" style="display: inline; margin-left: 10px;"
+                                                onsubmit="return confirm('Are you sure you want to cancel this running bot?')">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-stop-circle"></i>
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-1"></i>
+                            <p>No bot runs yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Schedules -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-check"></i>
+                            Today's Schedule
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if schedules %}
+                        {% for schedule in schedules %}
+                        <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded">
+                            <div>
+                                <strong>{{ schedule.scheduled_time }}</strong>
+                                <br>
+                                <small class="text-muted">{{ schedule.site_name }}</small>
+                                <br>
+                                <small class="text-muted">{{ schedule.duration_minutes }} min</small>
+                            </div>
+                            <div>
+                                <a href="/run-now/{{ schedule.id }}" class="btn btn-sm btn-outline-primary"
+                                    onclick="return confirm('Run this schedule now?')">
+                                    <i class="bi bi-play-fill"></i>
+                                    Run Now
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-calendar-x fs-1"></i>
+                            <p>No schedules configured</p>
+                            <a href="/add-task" class="btn btn-primary btn-sm">Add Task</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightning-fill"></i>
+                            Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/add-task" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i>
+                                Add New Task
+                            </a>
+                            <a href="/schedules" class="btn btn-outline-secondary">
+                                <i class="bi bi-calendar-check"></i>
+                                View Schedules
+                            </a>
+                            <a href="/settings" class="btn btn-outline-warning">
+                                <i class="bi bi-gear"></i>
+                                User Settings
+                            </a>
+                            <form method="POST" action="/clear-all-bots" style="margin-top: 10px;"
+                                onsubmit="return confirm('Clear all running bots? This will cancel any active bot instances.')">
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="bi bi-stop-circle"></i>
+                                    Clear All Running Bots
+                                </button>
+                            </form>
+                            <a href="/debug/screenshots" class="btn btn-outline-info w-100 mt-2" style="font-size: 0.85em;">
+                                <i class="bi bi-camera"></i>
+                                Debug Screenshots
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            fetch('/api/runs/recent')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the runs table if there are new entries
+                    console.log('Updated runs:', data.length);
+                });
+        }, 30000);
+
+        // Show loading state on action buttons
+        document.querySelectorAll('a[href*="/run-now/"]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                this.innerHTML = '<i class="bi bi-hourglass-split"></i> Starting...';
+                this.classList.add('disabled');
+            });
+        });
+    </script>
+
+</body>
+
+</html>

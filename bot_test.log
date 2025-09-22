@@ -1,0 +1,92 @@
+2025-09-22 21:28:54,968 - INFO - Testing site: http://antrigrahadipta.com
+2025-09-22 21:28:55,927 - WARNING - Missing form elements: ['name', 'ktp', 'phone_number', 'check', 'check_2', 'captcha_input']
+2025-09-22 21:30:39,568 - INFO - Testing site: http://127.0.0.1:5500/contoh.html
+2025-09-22 21:30:40,540 - INFO - Site test passed - all form elements found
+2025-09-22 21:30:40,550 - INFO - Loading site: http://127.0.0.1:5500/contoh.html
+2025-09-22 21:30:40,632 - INFO - Got CSRF token: 9sChBRWb4U...
+2025-09-22 21:30:45,656 - INFO - Raw captcha: '0D039yRU' -> Clean: '0D039yRU'
+2025-09-22 21:30:45,656 - INFO - Captcha text: 0D039yRU
+2025-09-22 21:30:46,503 - INFO - Submitting form...
+2025-09-22 21:30:46,772 - ERROR - Error filling form: Message: stale element reference: stale element not found
+  (Session info: chrome=140.0.7339.133); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#staleelementreferenceexception
+Stacktrace:
+0   chromedriver                        0x000000010a6e3f08 chromedriver + 5934856
+1   chromedriver                        0x000000010a6dbc9a chromedriver + 5901466
+2   chromedriver                        0x000000010a1a7ade chromedriver + 445150
+3   chromedriver                        0x000000010a1bbfa4 chromedriver + 528292
+4   chromedriver                        0x000000010a1bacd9 chromedriver + 523481
+5   chromedriver                        0x000000010a1af7fc chromedriver + 477180
+6   chromedriver                        0x000000010a1ad989 chromedriver + 469385
+7   chromedriver                        0x000000010a1b16d8 chromedriver + 485080
+8   chromedriver                        0x000000010a1b17a4 chromedriver + 485284
+9   chromedriver                        0x000000010a2051fc chromedriver + 827900
+10  chromedriver                        0x000000010a203046 chromedriver + 819270
+11  chromedriver                        0x000000010a2000dd chromedriver + 807133
+12  chromedriver                        0x000000010a1ff22d chromedriver + 803373
+13  chromedriver                        0x000000010a1f0f92 chromedriver + 745362
+14  chromedriver                        0x000000010a225732 chromedriver + 960306
+15  chromedriver                        0x000000010a1f08c8 chromedriver + 743624
+16  chromedriver                        0x000000010a2258ee chromedriver + 960750
+17  chromedriver                        0x000000010a24b0e1 chromedriver + 1114337
+18  chromedriver                        0x000000010a225503 chromedriver + 959747
+19  chromedriver                        0x000000010a1ee731 chromedriver + 735025
+20  chromedriver                        0x000000010a1efee1 chromedriver + 741089
+21  chromedriver                        0x000000010a6ad360 chromedriver + 5710688
+22  chromedriver                        0x000000010a6afc00 chromedriver + 5721088
+23  chromedriver                        0x000000010a6af77b chromedriver + 5719931
+24  chromedriver                        0x000000010a6b00a5 chromedriver + 5722277
+25  chromedriver                        0x000000010a692e97 chromedriver + 5602967
+26  chromedriver                        0x000000010a6b0372 chromedriver + 5722994
+27  chromedriver                        0x000000010a686584 chromedriver + 5551492
+28  chromedriver                        0x000000010a6cbd28 chromedriver + 5836072
+29  chromedriver                        0x000000010a6cbe85 chromedriver + 5836421
+30  chromedriver                        0x000000010a6db823 chromedriver + 5900323
+31  libsystem_pthread.dylib             0x00007ff809562df1 _pthread_start + 99
+32  libsystem_pthread.dylib             0x00007ff80955e857 thread_start + 15
+
+2025-09-22 21:30:47,244 - INFO - Screenshot saved: screenshots/ERROR_20250922_213046.png
+2025-09-22 21:31:43,380 - INFO - Testing site: http://127.0.0.1:5500/contoh.html
+2025-09-22 21:31:44,212 - INFO - Site test passed - all form elements found
+2025-09-22 21:31:44,218 - INFO - Loading site: http://127.0.0.1:5500/contoh.html
+2025-09-22 21:31:44,318 - INFO - Got CSRF token: 9sChBRWb4U...
+2025-09-22 21:31:49,257 - INFO - Raw captcha: '0D039yRU' -> Clean: '0D039yRU'
+2025-09-22 21:31:49,257 - INFO - Captcha text: 0D039yRU
+2025-09-22 21:31:50,026 - INFO - Submitting form...
+2025-09-22 21:31:50,240 - ERROR - Error filling form: Message: stale element reference: stale element not found
+  (Session info: chrome=140.0.7339.133); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#staleelementreferenceexception
+Stacktrace:
+0   chromedriver                        0x000000010e9caf08 chromedriver + 5934856
+1   chromedriver                        0x000000010e9c2c9a chromedriver + 5901466
+2   chromedriver                        0x000000010e48eade chromedriver + 445150
+3   chromedriver                        0x000000010e4a2fa4 chromedriver + 528292
+4   chromedriver                        0x000000010e4a1cd9 chromedriver + 523481
+5   chromedriver                        0x000000010e4967fc chromedriver + 477180
+6   chromedriver                        0x000000010e494989 chromedriver + 469385
+7   chromedriver                        0x000000010e4986d8 chromedriver + 485080
+8   chromedriver                        0x000000010e4987a4 chromedriver + 485284
+9   chromedriver                        0x000000010e4ec1fc chromedriver + 827900
+10  chromedriver                        0x000000010e4ea046 chromedriver + 819270
+11  chromedriver                        0x000000010e4e70dd chromedriver + 807133
+12  chromedriver                        0x000000010e4e622d chromedriver + 803373
+13  chromedriver                        0x000000010e4d7f92 chromedriver + 745362
+14  chromedriver                        0x000000010e50c732 chromedriver + 960306
+15  chromedriver                        0x000000010e4d78c8 chromedriver + 743624
+16  chromedriver                        0x000000010e50c8ee chromedriver + 960750
+17  chromedriver                        0x000000010e5320e1 chromedriver + 1114337
+18  chromedriver                        0x000000010e50c503 chromedriver + 959747
+19  chromedriver                        0x000000010e4d5731 chromedriver + 735025
+20  chromedriver                        0x000000010e4d6ee1 chromedriver + 741089
+21  chromedriver                        0x000000010e994360 chromedriver + 5710688
+22  chromedriver                        0x000000010e996c00 chromedriver + 5721088
+23  chromedriver                        0x000000010e99677b chromedriver + 5719931
+24  chromedriver                        0x000000010e9970a5 chromedriver + 5722277
+25  chromedriver                        0x000000010e979e97 chromedriver + 5602967
+26  chromedriver                        0x000000010e997372 chromedriver + 5722994
+27  chromedriver                        0x000000010e96d584 chromedriver + 5551492
+28  chromedriver                        0x000000010e9b2d28 chromedriver + 5836072
+29  chromedriver                        0x000000010e9b2e85 chromedriver + 5836421
+30  chromedriver                        0x000000010e9c2823 chromedriver + 5900323
+31  libsystem_pthread.dylib             0x00007ff809562df1 _pthread_start + 99
+32  libsystem_pthread.dylib             0x00007ff80955e857 thread_start + 15
+
+2025-09-22 21:31:50,520 - INFO - Screenshot saved: screenshots/ERROR_20250922_213150.png

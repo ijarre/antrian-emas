@@ -1,0 +1,21 @@
+[Unit]
+Description=ANTAM Bot Dashboard
+After=network.target
+
+[Service]
+Type=exec
+User=root
+WorkingDirectory=/opt/antam-bot
+ExecStart=/opt/antam-bot/start.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=antam-bot
+
+# Environment
+Environment=DISPLAY=:99
+Environment=PYTHONPATH=/opt/antam-bot
+
+[Install]
+WantedBy=multi-user.target

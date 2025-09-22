@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - ANTAM Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #379777;">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-robot"></i>
+                ANTAM Bot Control Panel
+            </a>
+
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Dashboard</a>
+                <a class="nav-link" href="/schedules">Schedules</a>
+                <a class="nav-link" href="/add-task">Add Task</a>
+                <a class="nav-link active" href="/settings">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-circle"></i>
+                            Personal Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Privacy Notice:</strong> This information is stored locally and used only for form
+                            submission.
+                            It matches the requirements of the ANTAM registration form.
+                        </div>
+
+                        <form method="POST" action="/settings/save">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">
+                                            <i class="bi bi-person"></i>
+                                            Full Name (as on KTP)
+                                        </label>
+                                        <input type="text" class="form-control" id="name" name="name"
+                                            value="{{ settings.name if settings else '' }}" placeholder="e.g., John Doe"
+                                            required oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
+                                        <div class="form-text">Must match your KTP exactly</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="ktp_last_6" class="form-label">
+                                            <i class="bi bi-credit-card-2-front"></i>
+                                            KTP Last 6 Digits
+                                        </label>
+                                        <input type="text" class="form-control" id="ktp_last_6" name="ktp_last_6"
+                                            value="{{ settings.ktp_last_6 if settings else '' }}" placeholder="123456"
+                                            maxlength="6" required
+                                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6)">
+                                        <div class="form-text">Only the last 6 digits of your KTP</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="phone_number" class="form-label">
+                                            <i class="bi bi-telephone"></i>
+                                            Phone Number
+                                        </label>
+                                        <input type="text" class="form-control" id="phone_number" name="phone_number"
+                                            value="{{ settings.phone_number if settings else '' }}"
+                                            placeholder="08123456789" maxlength="12" required
+                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                        <div class="form-text">Indonesian mobile number (08xxx)</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="bi bi-calendar"></i>
+                                            Last Updated
+                                        </label>
+                                        <div class="form-control-plaintext">
+                                            {% if settings and settings.updated_at %}
+                                            {{ settings.updated_at }}
+                                            {% else %}
+                                            Not configured yet
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="button" class="btn btn-outline-secondary me-md-2" onclick="clearForm()">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                    Reset
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i>
+                                    Save Settings
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-shield-check"></i>
+                            Security & Privacy
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-database"></i> Data Storage</h6>
+                                <ul class="list-unstyled">
+                                    <li>✅ Stored locally on your machine</li>
+                                    <li>✅ SQLite database (bot_control.db)</li>
+                                    <li>✅ No cloud storage</li>
+                                    <li>✅ No third-party access</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-eye-slash"></i> Privacy</h6>
+                                <ul class="list-unstyled">
+                                    <li>✅ KTP stored as last 6 digits only</li>
+                                    <li>✅ No password storage</li>
+                                    <li>✅ Local processing only</li>
+                                    <li>✅ You control all data</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-question-circle"></i>
+                            Troubleshooting
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="troubleshootingAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne">
+                                        Bot not submitting forms
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse"
+                                    data-bs-parent="#troubleshootingAccordion">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li>Check if your personal info is correctly formatted</li>
+                                            <li>Ensure KTP is exactly 6 digits</li>
+                                            <li>Verify phone number starts with 08</li>
+                                            <li>Test the target sites manually first</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseTwo">
+                                        Schedules not running
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse"
+                                    data-bs-parent="#troubleshootingAccordion">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li>Make sure this app is running during scheduled times</li>
+                                            <li>Check if schedules are enabled</li>
+                                            <li>Verify Chrome browser is installed</li>
+                                            <li>Check logs folder for error details</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function clearForm() {
+            if (confirm('Reset all settings? This cannot be undone.')) {
+                document.getElementById('name').value = '';
+                document.getElementById('ktp_last_6').value = '';
+                document.getElementById('phone_number').value = '';
+            }
+        }
+
+        // Real-time validation
+        document.getElementById('phone_number').addEventListener('input', function () {
+            const value = this.value;
+            const feedback = this.nextElementSibling;
+
+            if (value.length < 10) {
+                feedback.className = 'form-text text-danger';
+                feedback.textContent = 'Phone number too short (min 10 digits)';
+            } else if (!value.startsWith('08')) {
+                feedback.className = 'form-text text-warning';
+                feedback.textContent = 'Should start with 08 for Indonesian numbers';
+            } else {
+                feedback.className = 'form-text text-success';
+                feedback.textContent = '✓ Valid Indonesian mobile number';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

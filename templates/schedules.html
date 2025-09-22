@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Schedules - ANTAM Bot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #379777;">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-robot"></i>
+                ANTAM Bot Control Panel
+            </a>
+
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Dashboard</a>
+                <a class="nav-link active" href="/schedules">Schedules</a>
+                <a class="nav-link" href="/add-task">Add Task</a>
+                <a class="nav-link" href="/settings">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'danger' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calendar-check"></i>
+                            Active Schedules
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if schedules %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Site</th>
+                                        <th>Duration</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for schedule in schedules %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ schedule.scheduled_time }}</strong>
+                                            <br>
+                                            <small class="text-muted">Daily</small>
+                                        </td>
+                                        <td>{{ schedule.site_name }}</td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ schedule.duration_minutes }} min
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if schedule.enabled %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i>
+                                                Enabled
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-pause-circle"></i>
+                                                Disabled
+                                            </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="/run-now/{{ schedule.id }}" class="btn btn-sm btn-outline-success"
+                                                onclick="return confirm('Run this schedule now?')">
+                                                <i class="bi bi-play-fill"></i>
+                                                Run Now
+                                            </a>
+                                            <form method="POST" action="/schedules/toggle/{{ schedule.id }}"
+                                                style="display: inline;">
+                                                {% if schedule.enabled %}
+                                                <button type="submit" class="btn btn-sm btn-outline-warning">
+                                                    <i class="bi bi-pause"></i>
+                                                    Disable
+                                                </button>
+                                                {% else %}
+                                                <button type="submit" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-play"></i>
+                                                    Enable
+                                                </button>
+                                                {% endif %}
+                                            </form>
+                                            <form method="POST" action="/schedules/delete/{{ schedule.id }}"
+                                                style="display: inline;"
+                                                onsubmit="return confirm('Are you sure you want to delete this schedule?')">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-calendar-x fs-1"></i>
+                            <p>No schedules configured yet</p>
+                            <p class="small">Add your first schedule to start automating!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-plus-circle"></i>
+                            Add New Task
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center py-4">
+                            <i class="bi bi-plus-circle-fill fs-1 text-primary"></i>
+                            <h6 class="mt-3">Create a new scheduled task</h6>
+                            <p class="text-muted">Add both site and schedule together in one simple form</p>
+                            <a href="/add-task" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i>
+                                Create New Task
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightbulb"></i>
+                            Schedule Tips
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6>Recommended Times:</h6>
+                            <ul class="mb-0">
+                                <li><strong>07:00</strong> - Early morning (less traffic)</li>
+                                <li><strong>15:00</strong> - Mid afternoon</li>
+                                <li><strong>20:00</strong> - Evening</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Important:</h6>
+                            <ul class="mb-0">
+                                <li>Test sites before scheduling</li>
+                                <li>Don't overlap schedules</li>
+                                <li>15 minutes is usually enough</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set current time + 1 hour as default
+        document.addEventListener('DOMContentLoaded', function () {
+            const timeInput = document.getElementById('scheduled_time');
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            const timeString = now.toTimeString().slice(0, 5);
+            timeInput.value = timeString;
+        });
+    </script>
+
+</body>
+
+</html>
