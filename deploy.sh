@@ -42,6 +42,10 @@ rm chromedriver_linux64.zip
 echo "🖥️ Installing Xvfb for headless display..."
 apt install -y xvfb
 
+# Set timezone to WIB (Western Indonesia Time)
+echo "🕐 Setting timezone to WIB (Asia/Jakarta)..."
+timedatectl set-timezone Asia/Jakarta
+
 # Clone repository
 echo "📥 Cloning repository from GitHub..."
 if [ -d "/opt/antam-bot" ]; then

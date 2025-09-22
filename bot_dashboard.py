@@ -17,9 +17,13 @@ import subprocess
 import os
 from functools import wraps
 import base64
+import pytz
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = "your-secret-key-change-this"
+
+# Timezone setup - WIB (UTC+7)
+WIB = pytz.timezone('Asia/Jakarta')
 
 # Database setup
 DB_PATH = "bot_control.db"
@@ -146,7 +150,8 @@ class BotController:
     def check_and_run_scheduled_bots(self):
         """Check for bots that should run now"""
         conn = self.get_db_connection()
-        now = datetime.now()
+        # Use WIB timezone for scheduling
+        now = datetime.now(WIB)
         current_time = now.strftime("%H:%M")
         
         # Find schedules that should run now
@@ -181,7 +186,7 @@ class BotController:
         run_id = conn.execute('''
             INSERT INTO bot_runs (schedule_id, site_name, site_url, start_time, status)
             VALUES (?, ?, ?, ?, 'running')
-        ''', (schedule['id'], schedule['site_name'], schedule['site_url'], datetime.now())).lastrowid
+        ''', (schedule['id'], schedule['site_name'], schedule['site_url'], datetime.now(WIB))).lastrowid
         
         conn.commit()
         conn.close()
@@ -232,16 +237,16 @@ class BotController:
                 self.running_bots[run_id]['bot_instance'] = bot
             
             # Run bot
-            start_time = datetime.now()
+            start_time = datetime.now(WIB)
             success = False
             attempt_count = 0
-            
+
             end_time = start_time + timedelta(minutes=schedule['duration_minutes'])
             
-            while datetime.now() < end_time and not success:
+            while datetime.now(WIB) < end_time and not success:
                 # Check if cancelled
                 if run_id in self.running_bots and self.running_bots[run_id]['cancelled']:
-                    self.update_bot_run(run_id, 'cancelled', end_time=datetime.now(), attempts=attempt_count)
+                    self.update_bot_run(run_id, 'cancelled', end_time=datetime.now(WIB), attempts=attempt_count)
                     bot.cleanup()
                     self.disable_schedule_after_run(schedule['id'])
                     self.running_bots.pop(run_id, None)
@@ -261,7 +266,7 @@ class BotController:
             self.update_bot_run(
                 run_id,
                 final_status,
-                end_time=datetime.now(),
+                end_time=datetime.now(WIB),
                 attempts=attempt_count
             )
 
@@ -401,8 +406,8 @@ def dashboard():
         ORDER BY s.scheduled_time
     ''').fetchall()
     
-    # Get stats
-    today = datetime.now().strftime("%Y-%m-%d")
+    # Get stats (using WIB timezone)
+    today = datetime.now(WIB).strftime("%Y-%m-%d")
     stats = {
         'total_runs_today': conn.execute(
             "SELECT COUNT(*) FROM bot_runs WHERE date(start_time) = ?", (today,)
@@ -604,10 +609,12 @@ def screenshots():
         screenshots_list = []
         for img_file in SCREENSHOTS_DIR.glob('*.png'):
             stat = img_file.stat()
+            # Convert to WIB timezone for display
+            modified_time = datetime.fromtimestamp(stat.st_mtime, WIB)
             screenshots_list.append({
                 'filename': img_file.name,
                 'size': f"{stat.st_size / 1024:.1f} KB",
-                'modified': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+                'modified': modified_time.strftime('%Y-%m-%d %H:%M:%S WIB')
             })
 
         # Sort by modification time (newest first)
