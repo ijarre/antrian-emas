@@ -62,6 +62,8 @@ $DEPLOY_USER ALL=(ALL) NOPASSWD: /bin/rm -rf /opt/antam-bot
 $DEPLOY_USER ALL=(ALL) NOPASSWD: /bin/mv /opt/antam-bot-backup /opt/antam-bot
 $DEPLOY_USER ALL=(ALL) NOPASSWD: /usr/bin/journalctl -u antam-bot -n 20 --no-pager
 $DEPLOY_USER ALL=(ALL) NOPASSWD: /usr/bin/journalctl -u nginx -n 20 --no-pager
+$DEPLOY_USER ALL=(ALL) NOPASSWD: /bin/chmod +x /opt/antam-bot/update.sh
+$DEPLOY_USER ALL=(ALL) NOPASSWD: /bin/systemctl reload nginx
 EOF
 
 echo "✅ Sudo permissions configured"

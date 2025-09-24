@@ -59,8 +59,8 @@ jobs:
 
             # Use existing update script
             echo "🔄 Running update script..."
-            sudo chmod +x update.sh
-            sudo ./update.sh
+            sudo chmod +x /opt/antam-bot/update.sh
+            ./update.sh
 
             echo "✅ Deployment completed successfully!"
 
