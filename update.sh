@@ -25,8 +25,8 @@ pip install -r requirements.txt
 # Update nginx configuration if it exists
 if [ -f "nginx/antam-bot.conf" ]; then
   echo "🌐 Updating Nginx configuration..."
-  sudo cp nginx/antam-bot.conf /etc/nginx/sites-available/
-  sudo nginx -t && sudo systemctl reload nginx
+   cp nginx/antam-bot.conf /etc/nginx/sites-available/
+   nginx -t &&  systemctl reload nginx
 fi
 
 # Make scripts executable
