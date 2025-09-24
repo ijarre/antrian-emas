@@ -59,7 +59,7 @@ jobs:
 
             # Use existing update script
             echo "🔄 Running update script..."
-            chmod +x update.sh
+            sudo chmod +x update.sh
             sudo ./update.sh
 
             echo "✅ Deployment completed successfully!"
