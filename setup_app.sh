@@ -23,6 +23,14 @@ chmod +x /opt/antam-bot/setup_app.sh
 # Create directories
 mkdir -p logs screenshots
 
+# Setup nginx reverse proxy
+echo "🌐 Setting up Nginx reverse proxy..."
+cp nginx/antam-bot.conf /etc/nginx/sites-available/
+ln -sf /etc/nginx/sites-available/antam-bot.conf /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl restart nginx
+systemctl enable nginx
+
 # Setup systemd service
 echo "⚙️ Setting up systemd service..."
 cp antam-bot.service /etc/systemd/system/
@@ -46,14 +54,17 @@ systemctl status antam-bot --no-pager
 echo ""
 echo "✅ Deployment complete!"
 echo ""
-echo "🔗 Access your dashboard at: http://YOUR_DROPLET_IP:5005"
-echo "🔐 Screenshots access: http://YOUR_DROPLET_IP:5005/debug/screenshots (admin/admin)"
+echo "🔗 Access your dashboard at: http://YOUR_DROPLET_IP (via Nginx)"
+echo "📱 Direct Flask access: http://YOUR_DROPLET_IP:5005 (for debugging)"
+echo "🔐 Screenshots access: http://YOUR_DROPLET_IP/debug/screenshots (admin/admin)"
 echo ""
 echo "📝 Useful commands:"
-echo "  - Check service status: systemctl status antam-bot"
-echo "  - View logs: journalctl -u antam-bot -f"
-echo "  - Restart service: systemctl restart antam-bot"
-echo "  - Stop service: systemctl stop antam-bot"
+echo "  - Check Flask service: systemctl status antam-bot"
+echo "  - Check Nginx status: systemctl status nginx"
+echo "  - View Flask logs: journalctl -u antam-bot -f"
+echo "  - View Nginx logs: tail -f /var/log/nginx/antam-bot.*.log"
+echo "  - Restart services: systemctl restart antam-bot && systemctl restart nginx"
+echo "  - Stop services: systemctl stop antam-bot && systemctl stop nginx"
 echo ""
 echo "📂 Application files are in: /opt/antam-bot"
 echo "📋 Logs are in: /opt/antam-bot/logs/"

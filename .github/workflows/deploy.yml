@@ -1,0 +1,96 @@
+name: Deploy ANTAM Bot to VPS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Basic syntax check
+      run: |
+        python -m py_compile bot_dashboard.py
+        python -m py_compile antam_bot.py
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          set -e
+
+          echo "🚀 Starting deployment..."
+
+          # Navigate to app directory
+          cd /opt/antam-bot || exit 1
+
+          # Create backup before update
+          echo "📦 Creating backup..."
+          if [ -d "/opt/antam-bot-backup" ]; then
+            sudo rm -rf /opt/antam-bot-backup
+          fi
+          sudo cp -r /opt/antam-bot /opt/antam-bot-backup
+
+          # Use existing update script
+          echo "🔄 Running update script..."
+          chmod +x update.sh
+          sudo ./update.sh
+
+          echo "✅ Deployment completed successfully!"
+
+    - name: Rollback on failure
+      if: failure()
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          echo "🔄 Rolling back to previous version..."
+          if [ -d "/opt/antam-bot-backup" ]; then
+            sudo systemctl stop antam-bot || true
+            sudo rm -rf /opt/antam-bot
+            sudo mv /opt/antam-bot-backup /opt/antam-bot
+            cd /opt/antam-bot
+            sudo systemctl restart antam-bot
+            sudo systemctl restart nginx
+            echo "✅ Rollback completed"
+          else
+            echo "❌ No backup found for rollback"
+          fi
+
+    - name: Deployment notification
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment to VPS completed successfully!"
+          echo "🔗 Access your dashboard at: http://${{ secrets.VPS_HOST }}"
+        else
+          echo "❌ Deployment failed! Check the logs above."
+        fi

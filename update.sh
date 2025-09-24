@@ -22,8 +22,15 @@ echo "📦 Updating dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
+# Update nginx configuration if it exists
+if [ -f "nginx/antam-bot.conf" ]; then
+  echo "🌐 Updating Nginx configuration..."
+  sudo cp nginx/antam-bot.conf /etc/nginx/sites-available/
+  sudo nginx -t && sudo systemctl reload nginx
+fi
+
 # Make scripts executable
-chmod +x *.sh
+chmod +x *.sh scripts/*.sh
 
 # Start the service
 echo "🚀 Starting service..."
@@ -33,6 +40,17 @@ systemctl start antam-bot
 echo "📊 Service status:"
 systemctl status antam-bot --no-pager
 
+# Wait for service to start
+sleep 3
+
+# Test endpoint
+echo "🧪 Testing endpoint..."
+if curl -f -s http://localhost >/dev/null; then
+    echo "✅ HTTP endpoint is responding"
+else
+    echo "⚠️ HTTP endpoint test failed, check logs"
+fi
+
 echo ""
 echo "✅ Update complete!"
-echo "🔗 Access: http://$(curl -s ifconfig.me):5005"
+echo "🔗 Access: http://$(curl -s ifconfig.me 2>/dev/null || echo 'YOUR_SERVER_IP')"

@@ -17,9 +17,9 @@ REPO_URL="$1"
 echo "📦 Updating system packages..."
 apt update && apt upgrade -y
 
-# Install Git, Python and required packages
-echo "🐍 Installing Git, Python and dependencies..."
-apt install -y git python3 python3-pip python3-venv wget curl unzip
+# Install Git, Python, Nginx and required packages
+echo "🐍 Installing Git, Python, Nginx and dependencies..."
+apt install -y git python3 python3-pip python3-venv wget curl unzip nginx
 
 # Install Chrome and ChromeDriver
 echo "🌐 Installing Google Chrome..."
@@ -61,4 +61,5 @@ chmod +x setup_app.sh
 
 echo ""
 echo "✅ Deployment complete!"
-echo "🔗 Access your dashboard at: http://$(curl -s ifconfig.me):5005"
+echo "🔗 Access your dashboard at: http://$(curl -s ifconfig.me)"
+echo "📱 Direct Flask access: http://$(curl -s ifconfig.me):5005"
