@@ -72,6 +72,10 @@ echo "✅ Sudo permissions configured"
 if [ -d "/opt/antam-bot" ]; then
   chown -R $DEPLOY_USER:$DEPLOY_USER /opt/antam-bot
   echo "✅ Set ownership of /opt/antam-bot to $DEPLOY_USER"
+
+  # Configure git to trust the directory
+  sudo -u $DEPLOY_USER git config --global --add safe.directory /opt/antam-bot
+  echo "✅ Configured git to trust /opt/antam-bot directory"
 fi
 
 # Generate SSH key pair
